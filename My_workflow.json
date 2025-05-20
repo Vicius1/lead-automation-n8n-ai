@@ -1,0 +1,498 @@
+{
+  "name": "My workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "db289122-67aa-4a68-b928-85b492e24860",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -1480,
+        240
+      ],
+      "id": "cc75150a-0c0a-4bd9-a52e-4f27533ae0c2",
+      "name": "Webhook",
+      "webhookId": "db289122-67aa-4a68-b928-85b492e24860"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "33ffe150-6a90-4309-b7a0-5d5a0c35e855",
+              "name": "email",
+              "value": "={{$json[\"body\"][\"email\"]}}",
+              "type": "string"
+            },
+            {
+              "id": "b2e4a98f-cb52-4c00-b8bb-1662758f2411",
+              "name": "telefone",
+              "value": "={{$json[\"body\"][\"telefone\"]}}",
+              "type": "string"
+            },
+            {
+              "id": "d8eb48dc-adb2-4f42-a436-3609d18b3cd3",
+              "name": "nome",
+              "value": "={{$json[\"body\"][\"nome\"]}}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1260,
+        240
+      ],
+      "id": "b37cf3ed-8f74-4a75-876a-b4a3aa7f6a16",
+      "name": "Verificação de recebimento dos dados"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "ef2d231d-fa05-464b-a1ff-a4682d73ba09",
+              "leftValue": "={{ $json.email }}",
+              "rightValue": "^[\\w.-]+@[\\w.-]+\\.[a-zA-Z]{2,}$",
+              "operator": {
+                "type": "string",
+                "operation": "regex"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -1040,
+        240
+      ],
+      "id": "5615736d-2532-46d8-bc72-9a8f6b5e9b53",
+      "name": "Validação de formato de e-mail"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "4b60394c-54f6-46d1-8233-546142cf8784",
+              "leftValue": "={{ $json.telefone }}",
+              "rightValue": "^\\+?55\\d{10,11}$",
+              "operator": {
+                "type": "string",
+                "operation": "regex"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -820,
+        140
+      ],
+      "id": "2b1f0fb9-65c7-41a2-bd94-de226d278b1a",
+      "name": "Validação de formato de telefone"
+    },
+    {
+      "parameters": {
+        "calendar": {
+          "__rl": true,
+          "value": "www.vinicius.oliveira@gmail.com",
+          "mode": "list",
+          "cachedResultName": "www.vinicius.oliveira@gmail.com"
+        },
+        "additionalFields": {
+          "attendees": [
+            "={{ $json.email }}"
+          ],
+          "location": "Presencial",
+          "summary": "=Reunião com {{ $json.nome }}"
+        }
+      },
+      "type": "n8n-nodes-base.googleCalendar",
+      "typeVersion": 1.3,
+      "position": [
+        -600,
+        40
+      ],
+      "id": "4d60bf87-b5be-49e3-99cb-39f55908e09e",
+      "name": "Google Calendar marcando um evento no calendário"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "1039b1ec-214b-4901-8356-b1e290b8cbb0",
+              "name": "dataFormatada",
+              "value": "={{ new Date($json.start.dateTime).toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo', dateStyle: 'long', timeStyle: 'short' }).replace(/\\n/g, '').trim() }}\n",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -380,
+        40
+      ],
+      "id": "8e01ac51-6c6d-46b5-8772-339318c717af",
+      "name": "Formatação de data da reunião"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "34b4ebde-386a-4b8c-855c-fd2c2137a10f",
+              "name": "dataLimpa",
+              "value": "={{ $json.dataFormatada.replace(/\\n/g, '').trim() }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -160,
+        40
+      ],
+      "id": "01158d45-0938-4f10-a890-843c27764678",
+      "name": "Limpeza de informações da data da reunião"
+    },
+    {
+      "parameters": {
+        "instructions": "Crie uma mensagem formal em português para if1.nome , confirmando que a reunião foi agendada para dataLimpa.",
+        "codeGeneratedForPrompt": "Crie uma mensagem formal em português para if1.nome , confirmando que a reunião foi agendada para dataLimpa.",
+        "jsCode": "const items = $input.all();\nconst if1 = $(\"Validação de formato de telefone\").all()[0]?.json;\n\nconst message = `Olá ${if1.nome}, sua reunião foi agendada para ${items[0]?.json?.dataLimpa}.`;\n\nreturn { message };\n"
+      },
+      "type": "n8n-nodes-base.aiTransform",
+      "typeVersion": 1,
+      "position": [
+        60,
+        40
+      ],
+      "id": "ebe61ba2-771a-4d32-9978-b5d7238cf324",
+      "name": "AI Transform criando uma mensagem personalizada para o lead"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "(URL simulada criada no Webhook.site para teste do envio de mensagens)",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "mensagem",
+              "value": "={{ $json.message }}"
+            },
+            {
+              "name": "telefone",
+              "value": "={{ $('Validação de formato de telefone').item.json.telefone }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        280,
+        40
+      ],
+      "id": "e7921e32-f040-4470-9722-f499b1bd1660",
+      "name": "Envio de informações para o lead"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1IZayQOXe_XvSCnKe4-7ewXM21joZVqlvH1UMe1wej1Y",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Página1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1IZayQOXe_XvSCnKe4-7ewXM21joZVqlvH1UMe1wej1Y/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Nome": "={{ $('Validação de formato de telefone').item.json.nome }}",
+            "Email": "={{ $('Validação de formato de telefone').item.json.email }}",
+            "Telefone": "={{ $('Validação de formato de telefone').item.json.telefone }}",
+            "Data da Reunião": "={{ $('Limpeza de informações da data da reunião').item.json.dataLimpa }}",
+            "Status": "Agendado"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Nome",
+              "displayName": "Nome",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Telefone",
+              "displayName": "Telefone",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Data da Reunião",
+              "displayName": "Data da Reunião",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        500,
+        40
+      ],
+      "id": "9e631cf3-9a54-4ee6-aa0f-e56c4c38b6bd",
+      "name": "Google Sheets atualiza planilha de reuniões com  clientes"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://webhook.site/59b8d31b-ca9a-4e94-9cdf-e21f6f06571e",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "message",
+              "value": "=Telefone inválido para o lead  {{ $('Validação de formato de e-mail').item.json.nome }}: {{ $('Validação de formato de e-mail').item.json.telefone }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -600,
+        240
+      ],
+      "id": "699ac4a4-6d60-4546-8e2d-9f77970715cd",
+      "name": "Aviso de formato inválido de telefone"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://webhook.site/59b8d31b-ca9a-4e94-9cdf-e21f6f06571e",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "message",
+              "value": "=E-mail inválido para o lead {{ $json.nome }}: {{ $json.email }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -820,
+        340
+      ],
+      "id": "cdb52741-a072-4300-8fe2-6eea051ab2db",
+      "name": "Aviso de formato inválido de e-mail"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Verificação de recebimento dos dados",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Verificação de recebimento dos dados": {
+      "main": [
+        [
+          {
+            "node": "Validação de formato de e-mail",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validação de formato de e-mail": {
+      "main": [
+        [
+          {
+            "node": "Validação de formato de telefone",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Aviso de formato inválido de e-mail",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validação de formato de telefone": {
+      "main": [
+        [
+          {
+            "node": "Google Calendar marcando um evento no calendário",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Aviso de formato inválido de telefone",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Calendar marcando um evento no calendário": {
+      "main": [
+        [
+          {
+            "node": "Formatação de data da reunião",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Formatação de data da reunião": {
+      "main": [
+        [
+          {
+            "node": "Limpeza de informações da data da reunião",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Limpeza de informações da data da reunião": {
+      "main": [
+        [
+          {
+            "node": "AI Transform criando uma mensagem personalizada para o lead",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Transform criando uma mensagem personalizada para o lead": {
+      "main": [
+        [
+          {
+            "node": "Envio de informações para o lead",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Envio de informações para o lead": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets atualiza planilha de reuniões com  clientes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "e3428806-ac23-425c-9bca-6ca589f015fe",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "a8be60635f632037e5606283b260262debb3892e906f3fce89939efdb7837d14"
+  },
+  "id": "EKw5bpO0v6Cidqig",
+  "tags": []
+}
