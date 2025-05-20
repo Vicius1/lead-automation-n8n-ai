@@ -1,4 +1,4 @@
-![image](https://github.com/user-attachments/assets/9a13b559-d7f7-497a-bcd3-84a3f704e948)# Lead Automation com n8n + IA
+# Lead Automation com n8n + IA
 Projeto desenvolvido com foco em automação e integração de ferramentas utilizando o n8n, Google APIs e IA generativa.
 
 ## Objetivo
